@@ -19,6 +19,17 @@
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
+
+  ::selection {
+    background-color: var(--color-clay);
+    color: var(--color-cream);
+  }
+
+  /* Accessible focus states */
+  :focus-visible {
+    outline: 2px solid var(--color-clay);
+    outline-offset: 4px;
+  }
 }
 
 @layer utilities {

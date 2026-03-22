@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { Upload, FileText, Activity, Layers, HeartPulse, CheckCircle2, AlertTriangle } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Upload, FileText, Activity, Layers, HeartPulse, CheckCircle2, AlertTriangle, ChevronRight, ChevronLeft } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -11,6 +11,81 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function App() {
   const containerRef = useRef(null);
+  const [activeStep, setActiveStep] = useState(0);
+
+  const steps = [
+    {
+      id: 'diagnosis',
+      label: 'Diagnosis',
+      icon: <HeartPulse className="w-5 h-5" />,
+      title: 'Plain-Language Diagnosis.',
+      desc: 'We eliminate the cognitive load. Complex medical conditions are translated into a conversational format.',
+      content: (
+        <div className="bg-white p-8 rounded-[2rem] border border-black/5 flex items-start gap-6 shadow-sm">
+          <HeartPulse className="text-clay w-8 h-8 shrink-0 mt-1" />
+          <div>
+            <h4 className="font-sans font-bold text-moss text-xl mb-3">Hypertension (High Blood Pressure)</h4>
+            <p className="text-charcoal/60 leading-relaxed text-lg">
+              Your heart is currently working harder than normal to pump blood. This is manageable, and the prescribed medication will help relax your blood vessels to reduce this strain.
+            </p>
+          </div>
+        </div>
+      ),
+      image: "https://images.unsplash.com/photo-1550831107-1553da8c8464?q=80&w=2070&auto=format&fit=crop"
+    },
+    {
+      id: 'medication',
+      label: 'Medication',
+      icon: <Layers className="w-5 h-5" />,
+      title: 'Structured Regimen.',
+      desc: 'A clear, hourly breakdown of your treatment plan to ensure zero missed doses.',
+      content: (
+        <div className="overflow-hidden rounded-[2rem] border border-black/5 bg-white shadow-sm">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-moss/5">
+              <tr>
+                <th className="px-6 py-4 font-mono text-xs uppercase text-charcoal/50">Medicine</th>
+                <th className="px-6 py-4 font-mono text-xs uppercase text-charcoal/50">Timing</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b border-black/5">
+                <td className="px-6 py-4 font-bold text-moss">Lisinopril (10mg)</td>
+                <td className="px-6 py-4 text-charcoal/70 italic">Morning (After Breakfast)</td>
+              </tr>
+              <tr>
+                <td className="px-6 py-4 font-bold text-moss">Atorvastatin (20mg)</td>
+                <td className="px-6 py-4 text-charcoal/70 italic">Night (Before Bed)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      ),
+      image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?q=80&w=2070&auto=format&fit=crop"
+    },
+    {
+      id: 'checklist',
+      label: 'Next Steps',
+      icon: <CheckCircle2 className="w-5 h-5" />,
+      title: 'Actionable Recovery.',
+      desc: 'Specific lifestyle adjustments and follow-up markers for your healthcare team.',
+      content: (
+        <ul className="space-y-4">
+          {[
+            "Schedule blood test in 3 weeks",
+            "Monitor blood pressure daily at 9 AM",
+            "Restrict sodium intake to < 2000mg"
+          ].map((task, i) => (
+            <li key={i} className="flex items-center gap-4 bg-white p-5 rounded-2xl border border-black/5 shadow-sm">
+              <CheckCircle2 className="w-6 h-6 text-clay shrink-0" />
+              <span className="text-charcoal/80 font-medium">{task}</span>
+            </li>
+          ))}
+        </ul>
+      ),
+      image: "https://images.unsplash.com/photo-1579154204601-01588f351e67?q=80&w=2070&auto=format&fit=crop"
+    }
+  ];
 
   useEffect(() => {
     let ctx = gsap.context(() => {
@@ -75,10 +150,10 @@ export default function App() {
       {/* Floating Island Navbar */}
       <nav className="fixed top-6 left-1/2 -translate-x-1/2 z-50 nav-pill w-[90%] md:w-auto">
         <div className="bg-white/60 backdrop-blur-xl border border-moss/10 px-6 py-4 rounded-[2rem] flex justify-between items-center gap-8 shadow-sm">
-          <div className="font-serif italic text-xl md:text-2xl font-bold tracking-tight text-moss flex items-center gap-2">
+          <a href="#" className="font-serif italic text-xl md:text-2xl font-bold tracking-tight text-moss flex items-center gap-2">
             <Activity className="w-5 h-5 text-clay" />
             MedBuddy
-          </div>
+          </a>
           <div className="hidden md:flex items-center gap-6 text-sm font-medium tracking-wide">
             <a href="#intelligence" className="hover:text-moss transition-colors">Intelligence</a>
             <a href="#philosophy" className="hover:text-moss transition-colors">Philosophy</a>
@@ -94,9 +169,9 @@ export default function App() {
       <section className="relative h-[100dvh] flex items-end pb-20 px-4 md:px-16 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1470115636492-6d2b56f9146d?q=80&w=2070&auto=format&fit=crop"
-            alt="Dark organic abstract"
-            className="w-full h-full object-cover grayscale-[0.3]"
+            src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=2070&auto=format&fit=crop"
+            alt="Medical prescription and equipment"
+            className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-moss via-moss/80 to-transparent mix-blend-multiply" />
           <div className="absolute inset-0 bg-gradient-to-b from-charcoal/40 to-transparent" />
@@ -129,8 +204,15 @@ export default function App() {
       </section>
 
       {/* Features: The Precision Micro-UI Dashboard */}
-      <section id="intelligence" className="py-24 md:py-32 px-4 md:px-16 bg-cream">
-        <div className="max-w-7xl mx-auto">
+      <section id="intelligence" className="py-24 md:py-32 px-4 md:px-16 bg-cream relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/3 h-full opacity-5 pointer-events-none">
+          <img 
+            src="https://images.unsplash.com/photo-1505751172107-573225a9270e?q=80&w=2070&auto=format&fit=crop"
+            alt="Prescription and medication"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="max-w-7xl mx-auto relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-start">
             
             <div className="lg:col-span-4 sticky top-32">
@@ -162,9 +244,13 @@ export default function App() {
             </div>
 
             <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <DiagnosticShuffler />
-              <TelemetryTypewriter />
-              <div className="md:col-span-2">
+              <div className="hover:scale-[1.02] active:scale-[0.98] transition-transform cursor-pointer">
+                <DiagnosticShuffler />
+              </div>
+              <div className="hover:scale-[1.02] active:scale-[0.98] transition-transform cursor-pointer">
+                <TelemetryTypewriter />
+              </div>
+              <div className="md:col-span-2 hover:scale-[1.01] active:scale-[0.99] transition-transform cursor-pointer">
                 <ProtocolScheduler />
               </div>
             </div>
@@ -176,8 +262,8 @@ export default function App() {
       <section id="philosophy" className="philosophy-section bg-charcoal text-cream py-32 md:py-48 px-4 md:px-16 relative overflow-hidden">
         <div className="absolute inset-0 opacity-20 pointer-events-none">
           <img 
-             src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=2000"
-             alt="texture"
+             src="https://images.unsplash.com/photo-1631815589968-fdb09a223b1e?q=80&w=2070&auto=format&fit=crop"
+             alt="Close-up of medication"
              className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-charcoal mix-blend-color" />
@@ -185,25 +271,25 @@ export default function App() {
         
         <div className="relative z-10 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-32 items-center">
           <div>
-            <div className="reveal-text-line">
-              <h3 className="text-3xl md:text-5xl font-sans tracking-tight mb-2 text-white/40">
+            <div className="reveal-text-line group cursor-default">
+              <h3 className="text-3xl md:text-5xl font-sans tracking-tight mb-2 text-white/40 group-hover:text-white/60 transition-colors">
                 Modern medicine asks:
               </h3>
             </div>
-            <div className="reveal-text-line">
-              <h3 className="text-3xl md:text-5xl font-sans tracking-tight mb-12 text-white">
+            <div className="reveal-text-line group cursor-default">
+              <h3 className="text-3xl md:text-5xl font-sans tracking-tight mb-12 text-white group-hover:text-clay transition-colors">
                 What does this jargon mean?
               </h3>
             </div>
           </div>
           <div>
-            <div className="reveal-text-line">
-              <h3 className="text-5xl md:text-7xl font-serif italic text-clay mb-2">
+            <div className="reveal-text-line group cursor-default">
+              <h3 className="text-5xl md:text-7xl font-serif italic text-clay mb-2 group-hover:text-white transition-colors">
                 We ask:
               </h3>
             </div>
-            <div className="reveal-text-line">
-              <h3 className="text-4xl md:text-6xl font-serif italic text-cream">
+            <div className="reveal-text-line group cursor-default">
+              <h3 className="text-4xl md:text-6xl font-serif italic text-cream group-hover:text-clay transition-colors">
                 What is the optimal path forward?
               </h3>
             </div>
@@ -211,115 +297,76 @@ export default function App() {
         </div>
       </section>
 
-      {/* Sticky Stacking Archive (Protocol) */}
-      <section id="protocol" className="relative bg-cream">
-        
-        {/* Card 1: Diagnosis */}
-        <div className="stack-card sticky top-0 h-screen w-full bg-cream border-t border-black/5 flex items-center justify-center p-8 origin-top">
-          <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-            <div className="order-2 md:order-1">
-               <span className="text-clay font-mono text-sm uppercase tracking-widest mb-4 block">02 / Protocol</span>
-               <h2 className="text-5xl font-serif italic text-moss mb-6">Plain-Language Diagnosis.</h2>
-               <p className="text-charcoal/70 text-lg leading-relaxed mb-8">
-                 We eliminate the cognitive load. Complex medical conditions are translated into a conversational format, explaining precisely what is happening in your body without inducing panic.
-               </p>
-               <div className="bg-white p-6 rounded-[2rem] border border-black/5 flex items-start gap-4 shadow-sm">
-                 <HeartPulse className="text-clay w-6 h-6 shrink-0 mt-1" />
-                 <div>
-                   <h4 className="font-sans font-bold text-moss mb-2">Hypertension (High Blood Pressure)</h4>
-                   <p className="text-sm text-charcoal/60 leading-relaxed">
-                     Your heart is currently working harder than normal to pump blood. This is manageable, and the prescribed medication will help relax your blood vessels to reduce this strain.
-                   </p>
-                 </div>
-               </div>
-            </div>
-            <div className="order-1 md:order-2 flex justify-center">
-               {/* Visual representation: Rotating double helix or abstract representation */}
-               <div className="w-[300px] h-[300px] rounded-full border border-moss/20 flex items-center justify-center relative">
-                 <div className="w-[200px] h-[200px] rounded-full border border-clay animate-spin" style={{ animationDuration: '10s' }} />
-                 <div className="absolute w-[150px] h-[150px] rounded-full border border-moss border-dashed animate-spin opacity-50" style={{ animationDuration: '15s', animationDirection: 'reverse' }} />
-                 <Activity className="absolute text-moss w-12 h-12" />
-               </div>
-            </div>
+      {/* Multi-Page Schedule Flow */}
+      <section id="protocol" className="min-h-screen bg-cream py-24 px-4 md:px-16 flex flex-col justify-center">
+        <div className="max-w-6xl mx-auto w-full">
+          <div className="text-center mb-16">
+            <span className="text-clay font-mono text-sm uppercase tracking-widest mb-4 block">02 / Clinical Protocol</span>
+            <h2 className="text-4xl md:text-6xl font-serif italic text-moss">The Optimal Path Forward</h2>
           </div>
-        </div>
 
-        {/* Card 2: Medication Table */}
-        <div className="stack-card sticky top-0 h-screen w-full bg-white border-t border-black/5 flex items-center justify-center p-8 origin-top">
-          <div className="max-w-6xl w-full">
-            <div className="text-center mb-16">
-               <span className="text-clay font-mono text-sm uppercase tracking-widest mb-4 block">03 / Regimen</span>
-               <h2 className="text-5xl font-serif italic text-moss">Structured Medication.</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            {/* Nav Column */}
+            <div className="lg:col-span-3 flex lg:flex-col gap-4 justify-center">
+              {steps.map((step, idx) => (
+                <button
+                  key={step.id}
+                  onClick={() => setActiveStep(idx)}
+                  className={`flex items-center gap-4 px-6 py-4 rounded-2xl transition-all text-left border ${
+                    activeStep === idx 
+                      ? 'bg-moss text-cream border-moss shadow-lg scale-105' 
+                      : 'bg-white/50 text-moss/50 border-black/5 hover:bg-white'
+                  }`}
+                >
+                  <div className={`p-2 rounded-lg ${activeStep === idx ? 'bg-clay/20 text-clay' : 'bg-moss/5 text-moss/20'}`}>
+                    {step.icon}
+                  </div>
+                  <span className="font-bold text-sm tracking-tight hidden md:block">{step.label}</span>
+                </button>
+              ))}
             </div>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b-2 border-moss/10">
-                    <th className="py-4 font-mono text-xs uppercase text-charcoal/50 font-normal">Medicine Name</th>
-                    <th className="py-4 font-mono text-xs uppercase text-charcoal/50 font-normal">Dosage</th>
-                    <th className="py-4 font-mono text-xs uppercase text-charcoal/50 font-normal">Timing</th>
-                    <th className="py-4 font-mono text-xs uppercase text-charcoal/50 font-normal">Duration</th>
-                    <th className="py-4 font-mono text-xs uppercase text-charcoal/50 font-normal">Notes</th>
-                  </tr>
-                </thead>
-                <tbody className="text-sm md:text-base">
-                  <tr className="border-b border-black/5 hover:bg-cream/50 transition-colors">
-                    <td className="py-6 font-bold text-moss flex items-center gap-3"><Layers className="w-4 h-4 text-clay"/> Lisinopril</td>
-                    <td className="py-6 text-charcoal/80">10mg</td>
-                    <td className="py-6 text-charcoal/80">Morning (After Breakfast)</td>
-                    <td className="py-6 text-charcoal/80 font-mono">30 Days</td>
-                    <td className="py-6 text-charcoal/60">Take with water to prevent dry mouth</td>
-                  </tr>
-                  <tr className="border-b border-black/5 hover:bg-cream/50 transition-colors">
-                    <td className="py-6 font-bold text-moss flex items-center gap-3"><Layers className="w-4 h-4 text-clay"/> Atorvastatin</td>
-                    <td className="py-6 text-charcoal/80">20mg</td>
-                    <td className="py-6 text-charcoal/80">Night (Before Bed)</td>
-                    <td className="py-6 text-charcoal/80 font-mono">90 Days</td>
-                    <td className="py-6 text-charcoal/60">Avoid grapefruit juice</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
 
-        {/* Card 3: Checklists */}
-        <div className="stack-card sticky top-0 h-screen w-full bg-cream border-t border-black/5 flex items-center justify-center p-8 origin-top">
-          <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-            <div>
-               <h2 className="text-4xl font-serif italic text-moss mb-8">Follow-up Checklist.</h2>
-               <ul className="space-y-4">
-                 {[
-                   "Schedule blood test (Lipid Panel) in 3 weeks",
-                   "Monitor blood pressure daily at 9 AM",
-                   "Restrict sodium intake to < 2000mg/day",
-                   "Book follow-up appointment with Dr. Sharma"
-                 ].map((task, i) => (
-                   <li key={i} className="flex items-start gap-4 bg-white p-4 rounded-xl border border-black/5">
-                     <CheckCircle2 className="w-5 h-5 text-clay shrink-0 mt-0.5" />
-                     <span className="text-charcoal/80">{task}</span>
-                   </li>
-                 ))}
-               </ul>
-            </div>
-            <div>
-               <h2 className="text-4xl font-serif italic text-moss mb-8">Side Effect Alerts.</h2>
-               <div className="bg-white/50 backdrop-blur-sm p-6 rounded-[2rem] border border-clay/20">
-                 <p className="text-sm text-charcoal/60 mb-6 flex items-center gap-2 font-mono uppercase">
-                   <AlertTriangle className="w-4 h-4 text-clay" /> Watch for these symptoms:
-                 </p>
-                 <div className="space-y-4">
-                   <div className="border-l-2 border-clay pl-4">
-                     <h4 className="font-bold text-moss">Persistent Dry Cough</h4>
-                     <p className="text-sm text-charcoal/60">Common with Lisinopril. If it disrupts sleep, contact the doctor.</p>
-                   </div>
-                   <div className="border-l-2 border-clay pl-4">
-                     <h4 className="font-bold text-moss">Unexplained Muscle Ache</h4>
-                     <p className="text-sm text-charcoal/60">Call doctor immediately if observed alongside dark urine.</p>
-                   </div>
-                 </div>
-               </div>
+            {/* Content Display */}
+            <div className="lg:col-span-9 bg-white/40 backdrop-blur-md rounded-[3rem] p-8 md:p-12 border border-black/5 shadow-2xl relative overflow-hidden min-h-[500px] flex flex-col">
+              <div key={activeStep} className="animate-in fade-in slide-in-from-right-8 duration-500 h-full flex flex-col">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center h-full">
+                  <div>
+                    <h3 className="text-4xl font-serif italic text-moss mb-6">{steps[activeStep].title}</h3>
+                    <p className="text-charcoal/70 text-lg mb-10 leading-relaxed">{steps[activeStep].desc}</p>
+                    {steps[activeStep].content}
+                    
+                    <div className="mt-12 flex gap-4">
+                      <button 
+                        disabled={activeStep === 0}
+                        onClick={() => setActiveStep(prev => Math.max(0, prev - 1))}
+                        className={`p-4 rounded-full border transition-all ${
+                          activeStep === 0 ? 'opacity-20 cursor-not-allowed' : 'hover:bg-moss hover:text-cream border-moss text-moss'
+                        }`}
+                      >
+                        <ChevronLeft className="w-6 h-6" />
+                      </button>
+                      <button 
+                        disabled={activeStep === steps.length - 1}
+                        onClick={() => setActiveStep(prev => Math.min(steps.length - 1, prev + 1))}
+                        className={`p-4 rounded-full border transition-all ${
+                          activeStep === steps.length - 1 ? 'opacity-20 cursor-not-allowed' : 'hover:bg-moss hover:text-cream border-moss text-moss'
+                        }`}
+                      >
+                        <ChevronRight className="w-6 h-6" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="relative aspect-square md:aspect-auto h-full min-h-[300px] rounded-[2rem] overflow-hidden shadow-inner">
+                    <img 
+                      src={steps[activeStep].image} 
+                      alt={steps[activeStep].label}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-moss/10 mix-blend-multiply" />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
