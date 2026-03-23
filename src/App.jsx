@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Upload, FileText, Activity, Layers, HeartPulse, CheckCircle2, AlertTriangle, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Upload, FileText, Activity, Layers, HeartPulse, CheckCircle2, AlertTriangle, ChevronRight, ChevronLeft, Loader2 } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -9,9 +9,52 @@ import ProtocolScheduler from './components/ProtocolScheduler';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const WEBHOOK_URL = 'https://manavn8nworkflow.app.n8n.cloud/webhook-test/upload';
+
 export default function App() {
   const containerRef = useRef(null);
   const [activeStep, setActiveStep] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState(null); // 'success' | 'error' | null
+  const fileInputRef = useRef(null);
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setUploadStatus(null);
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('fileName', file.name);
+    formData.append('fileType', file.type);
+    formData.append('timestamp', new Date().toISOString());
+
+    try {
+      const response = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        setUploadStatus('success');
+      } else {
+        setUploadStatus('error');
+      }
+    } catch (error) {
+      console.error('Upload failed:', error);
+      setUploadStatus('error');
+    } finally {
+      setIsUploading(false);
+      // Reset status after 3 seconds
+      setTimeout(() => setUploadStatus(null), 3000);
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
 
   const steps = [
     {
@@ -159,9 +202,23 @@ export default function App() {
             <a href="#philosophy" className="hover:text-moss transition-colors">Philosophy</a>
             <a href="#protocol" className="hover:text-moss transition-colors">Protocol</a>
           </div>
-          <button className="bg-moss text-cream px-6 py-2 rounded-full text-sm font-medium magnetic whitespace-nowrap">
-            Upload Summary
-          </button>
+          <div className="flex items-center gap-3">
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileUpload} 
+              className="hidden" 
+              accept=".pdf,.txt,.jpg,.jpeg,.png"
+            />
+            <button 
+              onClick={triggerFileInput}
+              disabled={isUploading}
+              className={`bg-moss text-cream px-6 py-2 rounded-full text-sm font-medium magnetic whitespace-nowrap flex items-center gap-2 ${isUploading ? 'opacity-70 cursor-not-allowed' : ''}`}
+            >
+              {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+              {uploadStatus === 'success' ? 'Sent!' : uploadStatus === 'error' ? 'Failed' : 'Upload Summary'}
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -192,9 +249,13 @@ export default function App() {
             The AI that sits between a patient and confusion. Upload your discharge summary or prescription for a clinically accurate, plain-language translation.
           </p>
           <div className="hero-text flex flex-col sm:flex-row gap-4">
-            <button className="bg-white text-moss px-8 py-4 rounded-[2rem] font-medium flex items-center justify-center gap-3 magnetic">
-              <Upload className="w-5 h-5" />
-              Upload Document
+            <button 
+              onClick={triggerFileInput}
+              disabled={isUploading}
+              className="bg-white text-moss px-8 py-4 rounded-[2rem] font-medium flex items-center justify-center gap-3 magnetic"
+            >
+              {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
+              {uploadStatus === 'success' ? 'Document Sent' : uploadStatus === 'error' ? 'Upload Failed' : 'Upload Document'}
             </button>
             <button className="border border-white/20 px-8 py-4 rounded-[2rem] hover:bg-white/5 transition-colors text-center">
               View Sample Protocol
@@ -207,7 +268,7 @@ export default function App() {
       <section id="intelligence" className="py-24 md:py-32 px-4 md:px-16 bg-cream relative overflow-hidden">
         <div className="absolute top-0 right-0 w-1/3 h-full opacity-5 pointer-events-none">
           <img 
-            src="https://images.unsplash.com/photo-1505751172107-573225a9270e?q=80&w=2070&auto=format&fit=crop"
+            src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=2070&auto=format&fit=crop"
             alt="Prescription and medication"
             className="w-full h-full object-cover"
           />
@@ -222,13 +283,18 @@ export default function App() {
                 Our parsing engine ingests complex medical terminology and extracts a structured, actionable telemetry feed without hallucinating medical advice.
               </p>
               
-              <div className="bg-moss text-cream rounded-[2rem] p-8 flex flex-col items-center justify-center text-center mt-8 hover:bg-moss/90 transition-colors pointer-events-auto cursor-pointer border border-transparent hover:border-clay/30">
+              <div 
+                onClick={triggerFileInput}
+                className={`bg-moss text-cream rounded-[2rem] p-8 flex flex-col items-center justify-center text-center mt-8 hover:bg-moss/90 transition-colors pointer-events-auto cursor-pointer border border-transparent hover:border-clay/30 ${isUploading ? 'opacity-70 cursor-not-allowed' : ''}`}
+              >
                 <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mb-6">
-                  <Upload className="w-6 h-6 text-clay -mt-1" />
+                  {isUploading ? <Loader2 className="w-6 h-6 text-clay animate-spin" /> : <Upload className="w-6 h-6 text-clay -mt-1" />}
                 </div>
-                <h4 className="font-serif italic text-2xl mb-2">Initialize Parsing</h4>
-                <p className="text-sm text-cream/70 mb-6">Drag & drop prescription or discharge summary</p>
-                <div className="flex gap-4 font-mono text-xs w-full justify-center">
+                <h4 className="font-serif italic text-2xl mb-2">
+                  {uploadStatus === 'success' ? 'Success!' : uploadStatus === 'error' ? 'Failed' : 'Initialize Parsing'}
+                </h4>
+                <p className="text-sm text-cream/70 mb-6">Click to upload prescription or discharge summary</p>
+                <div className="flex gap-4 font-mono text-xs w-full justify-center" onClick={(e) => e.stopPropagation()}>
                    <select className="bg-transparent border border-cream/20 rounded-full px-3 py-1 outline-none text-cream/70 cursor-pointer text-center">
                      <option>Age: Auto</option>
                      <option>Child</option>
